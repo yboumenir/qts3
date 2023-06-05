@@ -6,8 +6,9 @@ This project provides a simple, synchronous, C++ API for amazon S3.
 Building
 ------------------------
 
-Include qts3.pri in your project, or com_github_msorvig_s3.pri for the
-namespaced qpm version.
+mkdir build && cd build
+cmake ../ && make 
+./example/example
 
 ---------------------
 

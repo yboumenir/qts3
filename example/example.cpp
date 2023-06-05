@@ -9,16 +9,28 @@ using namespace com::github::msorvig::s3;
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+    QByteArray accessKeyId, secretAccessKey, bucketName, objectName;
 
-    QByteArray accessKeyId = qgetenv("AWS_S3_ACCESS_KEY_ID");
-    QByteArray secretAccessKey = qgetenv("AWS_S3_SECRET_ACCESS_KEY");
+    if(argc > 4){
+        accessKeyId = QByteArray(argv[1]);
+        secretAccessKey = QByteArray(argv[2]);
+        bucketName = QByteArray(argv[3]);
+        objectName = QByteArray(argv[4]);
+    }
+    else{
+        qDebug() << "usage: <S3_KEY> <S3_SECRET> <S3_BUCKET> <FILE>";
+        exit(0);
+    }
 
-    QByteArray bucketName = "testbucket";
-    QByteArray objectName = "testfile";
+    qDebug() << "[accessKeyId] " << accessKeyId;
+    qDebug() << "[secretAccessKey] " << secretAccessKey;
+    qDebug() << "[bucketName] " << bucketName;
+    qDebug() << "[objectName] " << objectName;
+
     
     QtS3 s3(accessKeyId, secretAccessKey);
 
-    QFile f("example.cpp");
+    QFile f(objectName);
     f.open(QIODevice::ReadOnly);
     QByteArray contents = f.readAll();
     
@@ -29,10 +41,15 @@ int main(int argc, char **argv)
         
     qDebug() << "Checking object size";
     QtS3Reply<int> sizeReply = s3.size(bucketName, objectName);
-    if (!sizeReply.isSuccess())
+    if (!sizeReply.isSuccess()){
         qDebug() << "S3 size error:" << sizeReply.anyErrorString();
-    else
-        qDebug() << "Object size is:" << sizeReply.value();
+    }
+    else{
+        qDebug() << "Done! Object size is:" << sizeReply.value();
+        exit(0);
+    }
+
+    return app.exec();
 }
 
     
